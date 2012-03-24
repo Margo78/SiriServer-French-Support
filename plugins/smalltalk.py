@@ -5,32 +5,28 @@
 from plugin import *
 
 class smalltalk(Plugin):
-    
-    @register("de-DE", "(.*Hallo.*)|(.*Hi.*Siri.*)")
-    @register("en-US", "(.*Hello.*)|(.*Hi.*Siri.*)")
-    def st_hello(self, speech, language):
-        if language == 'de-DE':
-            self.say("Hallo.")
-        else:
-            self.say("Hello")
-        self.complete_request()
-
     @register("de-DE", ".*Dein Name.*")
     @register("en-US", ".*your name.*")
+    @register("fr-FR", "(((Ton.*)|(.*ton.*)).*nom)|((Comment|comment).*(.*appel.*))")
     def st_name(self, speech, language):
         if language == 'de-DE':
             self.say("Siri.")
-        else:
+        elif language == 'en-US':
             self.say("Siri.")
+        elif language == 'fr-FR':
+            self.say("On m'appele Siri, mais ca peux changer si tu veux.")
         self.complete_request()
 
     @register("de-DE", "Wie geht es dir?")
     @register("en-US", "How are you?")
+    @register("fr-FR", "(Comment vas-tu)|(.*ca roule.*?)")
     def st_howareyou(self, speech, language):
         if language == 'de-DE':
             self.say("Gut danke der Nachfrage.")
-        else:
+        elif language == 'en-US':
             self.say("Fine, thanks for asking!")
+        elif language == 'fr-FR':
+            self.say("Au top !!! Merci.")
         self.complete_request()
         
     @register("de-DE", ".*Danke.*")

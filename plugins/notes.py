@@ -47,56 +47,59 @@ class Create(ClientBoundCommand):
 
 class note(Plugin):
     localizations = {"noteDefaults": 
-                        {"searching":{"en-US": "Creating your note ..."}, 
-                         "result": {"en-US": "Here is your note:"},
-                         "nothing": {"en-US": "What should I note?"}}, 
+                        {"searching":{"en-US": "Creating your note ...","fr-FR": "Note ajouter..."}, 
+                         "result": {"en-US": "Here is your note:","fr-FR": "Voici votre note:"},
+                         "nothing": {"en-US": "What should I note?","fr-FR": "Que dois-je noter ?"}}, 
                     "failure": {
-                                "en-US": "I cannot type your note right now."
+                                "en-US": "I cannot type your note right now.","fr-FR": "Je ne peux pas creer votre note."
                                 }
                     }
     @register("en-US", "(.*note [a-zA-Z0-9]+)|(.*create.*note [a-zA-Z0-9]+)|(.*write.*note [a-zA-Z0-9]+)")
+    @register("fr-FR", "(Note)|(Note [a-zA-Z0-9]+)|(Ajouter note)|(Ajouter.*note [a-zA-Z0-9]+)|(Notez [a-zA-Z0-9]+)|(Prendre note)|(Prendre.*note [a-zA-Z0-9]+)")
     def writeNote(self, speech, language):
         content_raw = re.match(".*note ([a-zA-Z0-9, ]+)$", speech, re.IGNORECASE)
         if content_raw == None:
             view_initial = AddViews(self.refId, dialogPhase="Reflection")
             view_initial.views = [AssistantUtteranceView(text=note.localizations['noteDefaults']['nothing'][language], speakableText=note.localizations['noteDefaults']['nothing'][language], dialogIdentifier="Note#failed")]
+            answer = self.ask("Que dois-je noter ?")
+            content_raw = re.search("([a-zA-Z0-9, ]+)$", answer, re.IGNORECASE)
             self.sendRequestWithoutAnswer(view_initial)
         else:
             view_initial = AddViews(self.refId, dialogPhase="Reflection")
             view_initial.views = [AssistantUtteranceView(text=note.localizations['noteDefaults']['searching'][language], speakableText=note.localizations['noteDefaults']['searching'][language], dialogIdentifier="Note#creating")]
             self.sendRequestWithoutAnswer(view_initial)
-            
-            content_raw = content_raw.group(1).strip()
-            if "saying" in content_raw:
-                split = content_raw.split(' ')
-                if split[0] == "saying":
-                    split.pop(0)
-                    content_raw = ' '.join(map(str, split))
-            if "that" in content_raw:
-                split = content_raw.split(' ')
-                if split[0] == "that":
-                    split.pop(0)
-                    content_raw = ' '.join(map(str, split))
-            if "for" in content_raw:
-                split = content_raw.split(' ')
-                if split[0] == "for":
-                    split.pop(0)
-                    content_raw = ' '.join(map(str, split))
+
+        content_raw = content_raw.group(1).strip()
+        if "saying" in content_raw:
+            split = content_raw.split(' ')
+            if split[0] == "saying":
+                split.pop(0)
+                content_raw = ' '.join(map(str, split))
+        if "that" in content_raw:
+            split = content_raw.split(' ')
+            if split[0] == "that":
+                split.pop(0)
+                content_raw = ' '.join(map(str, split))
+        if "for" in content_raw:
+            split = content_raw.split(' ')
+            if split[0] == "for":
+                split.pop(0)
+                content_raw = ' '.join(map(str, split))
                 
-            note_create = Create()
-            note_create.contents = content_raw
-            note_return = self.getResponseForRequest(note_create)
+        note_create = Create()
+        note_create.contents = content_raw
+        note_return = self.getResponseForRequest(note_create)
         
-            view = AddViews(self.refId, dialogPhase="Summary")
-            view1 = AssistantUtteranceView(text=note.localizations['noteDefaults']['result'][language], speakableText=note.localizations['noteDefaults']['result'][language], dialogIdentifier="Note#created")
+        view = AddViews(self.refId, dialogPhase="Summary")
+        view1 = AssistantUtteranceView(text=note.localizations['noteDefaults']['result'][language], speakableText=note.localizations['noteDefaults']['result'][language], dialogIdentifier="Note#created")
         
-            note_ = NoteObject()
-            note_.contents = content_raw
-            note_.identifier = note_return["properties"]["identifier"]
+        note_ = NoteObject()
+        note_.contents = content_raw
+        note_.identifier = note_return["properties"]["identifier"]
         
-            view2 = NoteSnippet(notes=[note_])
-            view.views = [view1, view2]
-            self.sendRequestWithoutAnswer(view)
+        view2 = NoteSnippet(notes=[note_])
+        view.views = [view1, view2]
+        self.sendRequestWithoutAnswer(view)
         self.complete_request()
 
     
