@@ -23,6 +23,7 @@ class define(Plugin):
     
     @register("de-DE", "(zeig mir|zeige|zeig).*(bild|zeichnung) (vo. ein..|vo.|aus)* ([\w ]+)")
     @register("en-US", "(display|show me|show).*(picture|image|drawing|illustration) (of|an|a)* ([\w ]+)")
+    @register("fr-FR", "(Montre|Afficher|Affiche).*?(photos|photo|image|dessin|illustration)?.*(d'un|de|un|a)* ([\w ]+)")
     def defineword(self, speech, language, regex):
         Title = regex.group(regex.lastindex)
         Query = urllib.quote_plus(Title.encode("utf-8"))
