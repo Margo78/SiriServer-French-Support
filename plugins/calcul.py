@@ -21,7 +21,7 @@ class Calcul_Siri(Plugin):
         result_cacl = int(Premier_Nbr) / int(Deuxieme_Nbr)
         return result_cacl
 
-    @register("fr-FR", u"((Calcul)|(Calculer)) (?P<Premier>[0-9]+) (?P<Signe>(\+|\-|multiplié par|fois|divisé par)) (?P<Deuxieme>([0-9]+))$")
+    @register("fr-FR", u"((Calcul)|(Calculer))? (?P<Premier>[0-9]+) (?P<Signe>(\+|\-|multiplié par|fois|divisé par)) (?P<Deuxieme>([0-9]+))$")
     def Calcul_brunsson(self, speech, language, regex):
         Premier_Nombre = regex.group('Premier')
         Deuxieme_Nombre = regex.group('Deuxieme')
@@ -34,7 +34,6 @@ class Calcul_Siri(Plugin):
             u'divisé par': self.Calcul_Division(Premier_Nombre,Deuxieme_Nombre),
         }
         Result_calcul = Calcul_Swicth[Signe]
-        print Result_calcul
-        if language == 'fr-FR':
-            self.say("Le resultat de votre calcul est " + str(Result_calcul))
+        self.say("Le resultat de votre calcul est " + str(Result_calcul))
+        Reponse_Supplementaire = "Debut"
         self.complete_request()
